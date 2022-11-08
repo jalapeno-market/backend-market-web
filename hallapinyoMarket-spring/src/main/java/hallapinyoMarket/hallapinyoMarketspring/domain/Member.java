@@ -8,6 +8,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.validation.constraints.NotEmpty;
 
 @Entity
 @Getter @Setter
@@ -17,9 +18,12 @@ public class Member {
     @Column(name = "member_id")
     private long id;
 
+    @NotEmpty
     private String user_id;
 
+    @NotEmpty
     private String password;
 
+    @NotEmpty
     private String nickname;
 }

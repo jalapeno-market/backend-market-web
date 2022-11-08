@@ -28,7 +28,7 @@ public class MemberController {
         private String user_id;
 
         public MemberJoinDto(String user_id) {
-            user_id = user_id;
+            this.user_id = user_id;
         }
     }
 }

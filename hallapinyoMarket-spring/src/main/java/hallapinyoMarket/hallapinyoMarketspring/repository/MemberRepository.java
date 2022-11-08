@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -20,9 +21,15 @@ public class MemberRepository {
                 .getResultList();
     }
 
-    public List<Member> findById(String user_id) {
+    public List<Member> findByUserId(String user_id) {
         return em.createQuery("select m from Member m where m.user_id = :user_id", Member.class)
                 .setParameter("user_id", user_id)
                 .getResultList();
+    }
+
+    public Optional<Member> findByLoginId(String loginId) {
+        return findAll().stream()
+                .filter(m -> m.getUser_id().equals(loginId))
+                .findFirst();
     }
 }
