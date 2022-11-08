@@ -16,10 +16,10 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public Long join(Member member) {
+    public String join(Member member) {
         validateDuplicateMember(member);
         memberRepository.save(member);
-        return member.getId();
+        return member.getUser_id();
     }
 
     private void validateDuplicateMember(Member member) {

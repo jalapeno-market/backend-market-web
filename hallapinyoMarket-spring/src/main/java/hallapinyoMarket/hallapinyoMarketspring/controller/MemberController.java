@@ -19,16 +19,16 @@ public class MemberController {
 
     @PostMapping("/members/join")
     public MemberJoinDto saveMember(@RequestBody @Valid Member member) {
-        Long id = memberService.join(member);
-        return new MemberJoinDto(id);
+        String user_id = memberService.join(member);
+        return new MemberJoinDto(user_id);
     }
 
     @Data
     static class MemberJoinDto {
-        private Long id;
+        private String user_id;
 
-        public MemberJoinDto(Long id) {
-            this.id = id;
+        public MemberJoinDto(String user_id) {
+            user_id = user_id;
         }
     }
 }
