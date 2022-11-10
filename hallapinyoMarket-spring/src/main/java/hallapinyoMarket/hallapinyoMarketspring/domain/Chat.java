@@ -6,6 +6,8 @@ import lombok.Setter;
 
 import javax.persistence.*;
 
+import java.time.LocalDateTime;
+
 import static javax.persistence.FetchType.LAZY;
 
 @Entity
@@ -18,12 +20,19 @@ public class Chat {
 
     private String contents;
 
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
+
     @ManyToOne(fetch = LAZY)
+    @JoinColumn(name= "chattingRoom_id")
     private ChattingRoom chattingRoom;
 
     @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "sender_id")
     private Member sender;
 
     @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "sender_id")
     private Member receiver;
 }
