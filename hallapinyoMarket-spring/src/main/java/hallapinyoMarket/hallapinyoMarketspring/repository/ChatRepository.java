@@ -1,6 +1,7 @@
 package hallapinyoMarket.hallapinyoMarketspring.repository;
 
 import hallapinyoMarket.hallapinyoMarketspring.domain.Chat;
+import hallapinyoMarket.hallapinyoMarketspring.domain.ChattingRoom;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -22,7 +23,15 @@ public class ChatRepository {
     }
 
     public List<Chat> findAll() {
-        return em.createQuery("select m from Chat m", Chat.class)
+        return em.createQuery("select c from Chat c", Chat.class)
+                .getResultList();
+    }
+
+    public List<Chat> findByChattingRoomId(Long chattingRoom_id) {
+        return em.createQuery(
+                        "Select c from Chat c " +
+                                "where c.chattingRoom.id = :chattingRoom_id", Chat.class)
+                .setParameter("chattingRoom_id", chattingRoom_id)
                 .getResultList();
     }
 

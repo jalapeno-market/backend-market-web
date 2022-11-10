@@ -22,7 +22,7 @@ public class PostRepository {
     }
 
     public List<Post> findAll() {
-        return em.createQuery("select m from Post m", Post.class)
+        return em.createQuery("select p from Post p", Post.class)
                 .getResultList();
     }
 }

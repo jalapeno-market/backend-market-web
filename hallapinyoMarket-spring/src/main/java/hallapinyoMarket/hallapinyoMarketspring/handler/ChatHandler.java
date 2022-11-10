@@ -24,11 +24,13 @@ public class ChatHandler extends TextWebSocketHandler {
     // connection established
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+        log.info("클라이언트 접속 감지");
     }
 
     // connection closed
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+        log.info("클라이언트 연결 해제 감지");
     }
 
 }
