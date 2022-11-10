@@ -33,6 +33,6 @@ public class Chat {
     private Member sender;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "sender_id")
+    @JoinColumn(name = "receiver_id")
     private Member receiver;
 }
