@@ -2,6 +2,7 @@ package hallapinyoMarket.hallapinyoMarketspring.domain;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hallapinyoMarket.hallapinyoMarketspring.controller.login.LoginForm;
+import hallapinyoMarket.hallapinyoMarketspring.controller.login.SessionConst;
 import hallapinyoMarket.hallapinyoMarketspring.service.MemberService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,7 +39,7 @@ public class Login {
     }
 
     @Test
-    public void 로그인 () throws Exception {
+    public void 로그인_성공 () throws Exception {
         //given
         LoginForm loginForm = new LoginForm();
         loginForm.setLoginId("test");
@@ -53,4 +54,22 @@ public class Login {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
+
+    @Test
+    public void 로그인_실패 () throws Exception {
+        //given
+        LoginForm loginForm = new LoginForm();
+        loginForm.setLoginId("test");
+        loginForm.setPassword("test1");
+
+        //when
+        String body = objectMapper.writeValueAsString(loginForm);
+
+        //then
+        mvc.perform(MockMvcRequestBuilders.post("/login")
+                        .content(body)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
 }
