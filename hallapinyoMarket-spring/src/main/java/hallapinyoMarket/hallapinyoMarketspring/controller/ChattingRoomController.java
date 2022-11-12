@@ -6,7 +6,7 @@ import hallapinyoMarket.hallapinyoMarketspring.domain.Post;
 import hallapinyoMarket.hallapinyoMarketspring.repository.ChattingRoomRepository;
 import hallapinyoMarket.hallapinyoMarketspring.repository.MemberRepository;
 import hallapinyoMarket.hallapinyoMarketspring.repository.PostRepository;
-import hallapinyoMarket.hallapinyoMarketspring.web.postIdSendForm;
+import hallapinyoMarket.hallapinyoMarketspring.web.PostIdSendForm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,7 +38,7 @@ public class ChattingRoomController {
 
     @ResponseBody
     @PostMapping("member/{member_id}/post/{post_id}/ChattingRoom") // 해당 포스트를 이용해 채팅룸을 생성한다.
-    public postIdSendForm createChattingRoomByPost(@PathVariable("post_id") Long post_id, @PathVariable("member_id") Long member_id) {
+    public PostIdSendForm createChattingRoomByPost(@PathVariable("post_id") Long post_id, @PathVariable("member_id") Long member_id) {
         Member member = memberRepository.find(member_id);
         Post post = postRepository.find(post_id);
 
@@ -47,7 +47,7 @@ public class ChattingRoomController {
         chattingRoom.setSeller(post.getMember());
         chattingRoom.setPost(post);
 
-        postIdSendForm form = new postIdSendForm();
+        PostIdSendForm form = new PostIdSendForm();
         form.setId(chattingRoomRepository.save(chattingRoom));
         return form;
     }
