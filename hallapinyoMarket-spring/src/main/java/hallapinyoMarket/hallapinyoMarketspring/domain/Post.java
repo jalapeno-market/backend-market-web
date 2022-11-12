@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static javax.persistence.FetchType.*;
 
@@ -31,4 +32,12 @@ public class Post {
 
     @ManyToOne(fetch = LAZY)
     private Member member;
+
+    public Post(String title, String contents, Image image, Member member, LocalDateTime createdAt) {
+        this.title = title;
+        this.contents = contents;
+        this.image = image;
+        this.member = member;
+        this.createdAt = createdAt;
+    }
 }
