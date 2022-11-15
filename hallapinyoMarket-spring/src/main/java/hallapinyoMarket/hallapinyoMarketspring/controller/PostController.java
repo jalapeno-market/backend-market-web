@@ -1,5 +1,7 @@
 package hallapinyoMarket.hallapinyoMarketspring.controller;
 
+import hallapinyoMarket.hallapinyoMarketspring.controller.dto.PostManyDto;
+import hallapinyoMarket.hallapinyoMarketspring.controller.dto.PostOneDto;
 import hallapinyoMarket.hallapinyoMarketspring.controller.login.SessionConst;
 import hallapinyoMarket.hallapinyoMarketspring.domain.Image;
 import hallapinyoMarket.hallapinyoMarketspring.domain.Member;
@@ -71,7 +73,7 @@ public class PostController {
     }
 
     @GetMapping("/post/{postId}")
-    public PostDto getPost(@PathVariable("postId") long postId, HttpServletRequest request) throws Exception{
+    public PostOneDto getPost(@PathVariable("postId") long postId, HttpServletRequest request) throws Exception{
 
         HttpSession session = request.getSession(false);
         if(session == null || session.getAttribute(SessionConst.LOGIN_MEMBER) == null) {
@@ -79,7 +81,7 @@ public class PostController {
         }
 
         Post findPost = postService.findOne(postId);
-        return new PostDto(findPost);
+        return PostOneDto.from(findPost);
     }
 
     @GetMapping("/post")
@@ -88,8 +90,8 @@ public class PostController {
             @RequestParam(value = "limit", defaultValue = "10") int limit)
     {
         List<Post> posts = postService.findAll(offset, limit);
-        List<PostDto> collect = posts.stream()
-                .map(p -> new PostDto(p))
+        List<PostManyDto> collect = posts.stream()
+                .map(p -> PostManyDto.from(p))
                 .collect(Collectors.toList());
 
         return new Result(collect);
@@ -109,27 +111,6 @@ public class PostController {
     @AllArgsConstructor
     static class Result<T> {
         private T data;
-    }
-
-    @Data
-    static class PostDto {
-        private long id;
-        private String title;
-        private String contents;
-        private Image image;
-        private LocalDateTime createdAt;
-        private LocalDateTime updatedAt;
-        private String userId;
-
-        public PostDto(Post post) {
-            this.id = post.getId();
-            this.title = post.getTitle();
-            this.contents = post.getContents();;
-            this.image = post.getImage();
-            this.createdAt = post.getCreatedAt();
-            this.updatedAt = post.getUpdatedAt();
-            this.userId = post.getMember().getUserId();
-        }
     }
 
     @Data
