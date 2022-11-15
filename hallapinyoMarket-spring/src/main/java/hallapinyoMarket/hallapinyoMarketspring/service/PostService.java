@@ -2,6 +2,7 @@ package hallapinyoMarket.hallapinyoMarketspring.service;
 
 import hallapinyoMarket.hallapinyoMarketspring.domain.Post;
 import hallapinyoMarket.hallapinyoMarketspring.repository.PostRepository;
+import hallapinyoMarket.hallapinyoMarketspring.repository.dto.PostOneDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +22,7 @@ public class PostService {
         return post.getId();
     }
 
-    public Post findOne(Long postId) {
+    public PostOneDto findOne(Long postId) {
         return postRepository.findOne(postId);
     }
 

@@ -1,6 +1,12 @@
 package hallapinyoMarket.hallapinyoMarketspring.repository;
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import hallapinyoMarket.hallapinyoMarketspring.domain.Post;
+import hallapinyoMarket.hallapinyoMarketspring.domain.PostStatus;
+import hallapinyoMarket.hallapinyoMarketspring.domain.QMember;
+import hallapinyoMarket.hallapinyoMarketspring.domain.QPost;
+import hallapinyoMarket.hallapinyoMarketspring.repository.dto.PostManyDto;
+import hallapinyoMarket.hallapinyoMarketspring.repository.dto.PostOneDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -17,15 +23,21 @@ public class PostRepository {
         em.persist(post);
     }
 
-    public Post findOne(Long id) {
-        return em.find(Post.class, id);
+    public PostOneDto findOne(Long id) {
+        return PostOneDto.from(em.find(Post.class, id));
     }
 
     public List<Post> findAllPost(int offset, int limit) {
-        return em.createQuery("select p from Post p" +
-                        " order by p.createdAt desc")
-                .setFirstResult(offset)
-                .setMaxResults(limit)
-                .getResultList();
+        QPost post = QPost.post;
+
+        JPAQueryFactory query = new JPAQueryFactory(em);
+
+        return query
+                .select(post)
+                .from(post)
+                .where(QPost.post.status.eq(PostStatus.SALE))
+                .offset(offset)
+                .limit(limit)
+                .fetch();
     }
 }

@@ -61,17 +61,17 @@ public class LoginController {
         HttpSession session = request.getSession();
         session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember);
 
-        return new MemberDto(loginMember.getUser_id(), loginMember.getNickname());
+        return new MemberDto(loginMember.getUserId(), loginMember.getNickname());
     }
 
 
     @Data
     static class MemberDto {
-        private String user_id;
+        private String userId;
         private String nickname;
 
-        public MemberDto(String user_id, String nickname) {
-            this.user_id = user_id;
+        public MemberDto(String userId, String nickname) {
+            this.userId = userId;
             this.nickname = nickname;
         }
     }

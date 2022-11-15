@@ -1,5 +1,6 @@
-package hallapinyoMarket.hallapinyoMarketspring.controller.dto;
+package hallapinyoMarket.hallapinyoMarketspring.repository.dto;
 
+import com.querydsl.core.annotations.QueryProjection;
 import hallapinyoMarket.hallapinyoMarketspring.domain.Image;
 import hallapinyoMarket.hallapinyoMarketspring.domain.Post;
 import hallapinyoMarket.hallapinyoMarketspring.domain.PostStatus;

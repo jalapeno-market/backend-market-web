@@ -1,7 +1,7 @@
 package hallapinyoMarket.hallapinyoMarketspring.controller;
 
-import hallapinyoMarket.hallapinyoMarketspring.controller.dto.PostManyDto;
-import hallapinyoMarket.hallapinyoMarketspring.controller.dto.PostOneDto;
+import hallapinyoMarket.hallapinyoMarketspring.repository.dto.PostManyDto;
+import hallapinyoMarket.hallapinyoMarketspring.repository.dto.PostOneDto;
 import hallapinyoMarket.hallapinyoMarketspring.controller.login.SessionConst;
 import hallapinyoMarket.hallapinyoMarketspring.domain.Image;
 import hallapinyoMarket.hallapinyoMarketspring.domain.Member;
@@ -76,8 +76,7 @@ public class PostController {
     public PostOneDto getPost(@PathVariable("postId") Long postId, HttpServletRequest request) throws Exception{
 
         validAuthorized(request.getSession(false));
-        Post findPost = postService.findOne(postId);
-        return PostOneDto.from(findPost);
+        return postService.findOne(postId);
     }
 
     @GetMapping("/post")
