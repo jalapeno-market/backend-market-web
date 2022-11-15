@@ -53,9 +53,7 @@ public class PostController {
     public PostIdDto savePost(@ModelAttribute @Valid PostForm postForm, HttpServletRequest request) throws Exception {
 
         HttpSession session = request.getSession(false);
-        if(session == null || session.getAttribute(SessionConst.LOGIN_MEMBER) == null) {
-            throw new IllegalAccessException("잘못된 접근입니다.");
-        }
+        validAuthorized(session);
 
         List<String> saveImageNames = new ArrayList<>();
         for (MultipartFile image : postForm.getImages()) {
@@ -77,11 +75,7 @@ public class PostController {
     @GetMapping("/post/{postId}")
     public PostOneDto getPost(@PathVariable("postId") Long postId, HttpServletRequest request) throws Exception{
 
-        HttpSession session = request.getSession(false);
-        if(session == null || session.getAttribute(SessionConst.LOGIN_MEMBER) == null) {
-            throw new IllegalAccessException("잘못된 접근입니다.");
-        }
-
+        validAuthorized(request.getSession(false));
         Post findPost = postService.findOne(postId);
         return PostOneDto.from(findPost);
     }
@@ -89,14 +83,22 @@ public class PostController {
     @GetMapping("/post")
     public Result getPosts(
             @RequestParam(value = "offset", defaultValue = "0") int offset,
-            @RequestParam(value = "limit", defaultValue = "10") int limit)
+            @RequestParam(value = "limit", defaultValue = "10") int limit,
+            HttpServletRequest request) throws Exception
     {
+        validAuthorized(request.getSession(false));
         List<Post> posts = postService.findAll(offset, limit);
         List<PostManyDto> collect = posts.stream()
                 .map(p -> PostManyDto.from(p))
                 .collect(Collectors.toList());
 
         return new Result(collect);
+    }
+
+    private static void validAuthorized(HttpSession session) throws IllegalAccessException {
+        if(session == null || session.getAttribute(SessionConst.LOGIN_MEMBER) == null) {
+            throw new IllegalAccessException("잘못된 접근입니다.");
+        }
     }
 
     private Image getImageInstance(List<String> saveImageNames) { //리팩토링 하기
