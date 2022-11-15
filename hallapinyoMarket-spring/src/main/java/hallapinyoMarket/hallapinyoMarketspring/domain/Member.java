@@ -16,10 +16,10 @@ public class Member {
 
     @Id @GeneratedValue
     @Column(name = "member_id")
-    private long id;
+    private Long id;
 
     @NotEmpty
-    private String user_id;
+    private String userId;
 
     @NotEmpty
     private String password;

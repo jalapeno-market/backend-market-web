@@ -17,7 +17,7 @@ public class Post {
     @Id
     @GeneratedValue
     @Column(name = "post_id")
-    private long id;
+    private Long id;
 
     private String title;
 
@@ -33,11 +33,13 @@ public class Post {
     @ManyToOne(fetch = LAZY)
     private Member member;
 
-    public Post(String title, String contents, Image image, Member member, LocalDateTime createdAt) {
-        this.title = title;
-        this.contents = contents;
-        this.image = image;
-        this.member = member;
-        this.createdAt = createdAt;
+    public static Post createPost(String title, String contents, Image image, Member member, LocalDateTime createdAt) {
+        Post post = new Post();
+        post.setTitle(title);
+        post.setContents(contents);
+        post.setImage(image);
+        post.setMember(member);
+        post.setCreatedAt(createdAt);
+        return post;
     }
 }

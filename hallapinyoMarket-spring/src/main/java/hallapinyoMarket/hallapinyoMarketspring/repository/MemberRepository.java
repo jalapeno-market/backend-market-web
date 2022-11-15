@@ -22,14 +22,14 @@ public class MemberRepository {
     }
 
     public List<Member> findByUserId(String user_id) {
-        return em.createQuery("select m from Member m where m.user_id = :user_id", Member.class)
+        return em.createQuery("select m from Member m where m.userId = :user_id", Member.class)
                 .setParameter("user_id", user_id)
                 .getResultList();
     }
 
     public Optional<Member> findByLoginId(String loginId) {
         return findAll().stream()
-                .filter(m -> m.getUser_id().equals(loginId))
+                .filter(m -> m.getUserId().equals(loginId))
                 .findFirst();
     }
 }

@@ -7,6 +7,7 @@ import hallapinyoMarket.hallapinyoMarketspring.domain.Post;
 import hallapinyoMarket.hallapinyoMarketspring.exception.exhandler.ErrorResult;
 import hallapinyoMarket.hallapinyoMarketspring.service.PostService;
 import hallapinyoMarket.hallapinyoMarketspring.service.S3UploaderService;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -62,10 +64,35 @@ public class PostController {
 
         Member loginMember = (Member) session.getAttribute(SessionConst.LOGIN_MEMBER);
         Image image = getImageInstance(saveImageNames);
-        Post post = new Post(postForm.title, postForm.contents, image, loginMember, LocalDateTime.now());
+        Post post = Post.createPost(postForm.title, postForm.contents, image, loginMember, LocalDateTime.now());
         long post_id = postService.save(post);
 
         return new PostIdDto(post_id);
+    }
+
+    @GetMapping("/post/{postId}")
+    public PostDto getPost(@PathVariable("postId") long postId, HttpServletRequest request) throws Exception{
+
+        HttpSession session = request.getSession(false);
+        if(session == null || session.getAttribute(SessionConst.LOGIN_MEMBER) == null) {
+            throw new IllegalAccessException("잘못된 접근입니다.");
+        }
+
+        Post findPost = postService.findOne(postId);
+        return new PostDto(findPost);
+    }
+
+    @GetMapping("/post")
+    public Result getPosts(
+            @RequestParam(value = "offset", defaultValue = "0") int offset,
+            @RequestParam(value = "limit", defaultValue = "10") int limit)
+    {
+        List<Post> posts = postService.findAll(offset, limit);
+        List<PostDto> collect = posts.stream()
+                .map(p -> new PostDto(p))
+                .collect(Collectors.toList());
+
+        return new Result(collect);
     }
 
     private Image getImageInstance(List<String> saveImageNames) { //리팩토링 하기
@@ -79,6 +106,12 @@ public class PostController {
     }
 
     @Data
+    @AllArgsConstructor
+    static class Result<T> {
+        private T data;
+    }
+
+    @Data
     static class PostDto {
         private long id;
         private String title;
@@ -86,15 +119,16 @@ public class PostController {
         private Image image;
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
+        private String userId;
 
-        public PostDto(long id, String title, String contents, Image image, LocalDateTime createdAt,
-                       LocalDateTime updatedAt) {
-            this.id = id;
-            this.title = title;
-            this.contents = contents;
-            this.image = image;
-            this.createdAt = createdAt;
-            this.updatedAt = updatedAt;
+        public PostDto(Post post) {
+            this.id = post.getId();
+            this.title = post.getTitle();
+            this.contents = post.getContents();;
+            this.image = post.getImage();
+            this.createdAt = post.getCreatedAt();
+            this.updatedAt = post.getUpdatedAt();
+            this.userId = post.getMember().getUserId();
         }
     }
 

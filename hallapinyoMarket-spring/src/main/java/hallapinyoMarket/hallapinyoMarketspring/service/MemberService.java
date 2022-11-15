@@ -19,17 +19,17 @@ public class MemberService {
     public String join(Member member) {
         validateDuplicateMember(member);
         memberRepository.save(member);
-        return member.getUser_id();
+        return member.getUserId();
     }
 
     private void validateDuplicateMember(Member member) {
-        List<Member> findMembers = memberRepository.findByUserId(member.getUser_id());
+        List<Member> findMembers = memberRepository.findByUserId(member.getUserId());
         if(!findMembers.isEmpty()) {
             throw new IllegalStateException("이미 존재하는 회원입니다.");
         }
     }
 
-    public Member findOne(String user_id) {
-        return memberRepository.findByUserId(user_id).get(0);
+    public Member findOne(String userId) {
+        return memberRepository.findByUserId(userId).get(0);
     }
 }

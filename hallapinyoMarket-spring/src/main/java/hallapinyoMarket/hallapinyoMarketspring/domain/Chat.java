@@ -14,7 +14,7 @@ public class Chat {
 
     @Id @GeneratedValue
     @Column(name = "chat_id")
-    private long id;
+    private Long id;
 
     private String contents;
 

@@ -11,7 +11,7 @@ public class ChattingRoom {
 
     @Id @GeneratedValue
     @Column(name = "chattingRoom_id")
-    private long id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member buyer;
