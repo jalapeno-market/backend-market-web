@@ -28,8 +28,4 @@ public class MemberService {
             throw new IllegalStateException("이미 존재하는 회원입니다.");
         }
     }
-
-    public Member findOne(String userId) {
-        return memberRepository.findByUserId(userId).get(0);
-    }
 }

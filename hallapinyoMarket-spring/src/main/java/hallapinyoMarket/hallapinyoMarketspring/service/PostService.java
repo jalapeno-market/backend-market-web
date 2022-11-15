@@ -16,12 +16,12 @@ public class PostService {
     private final PostRepository postRepository;
 
     @Transactional
-    public long save(Post post) {
+    public Long save(Post post) {
         postRepository.save(post);
         return post.getId();
     }
 
-    public Post findOne(long postId) {
+    public Post findOne(Long postId) {
         return postRepository.findOne(postId);
     }
 

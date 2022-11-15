@@ -6,6 +6,7 @@ import hallapinyoMarket.hallapinyoMarketspring.controller.login.SessionConst;
 import hallapinyoMarket.hallapinyoMarketspring.domain.Image;
 import hallapinyoMarket.hallapinyoMarketspring.domain.Member;
 import hallapinyoMarket.hallapinyoMarketspring.domain.Post;
+import hallapinyoMarket.hallapinyoMarketspring.domain.PostStatus;
 import hallapinyoMarket.hallapinyoMarketspring.exception.exhandler.ErrorResult;
 import hallapinyoMarket.hallapinyoMarketspring.service.PostService;
 import hallapinyoMarket.hallapinyoMarketspring.service.S3UploaderService;
@@ -66,14 +67,15 @@ public class PostController {
 
         Member loginMember = (Member) session.getAttribute(SessionConst.LOGIN_MEMBER);
         Image image = getImageInstance(saveImageNames);
-        Post post = Post.createPost(postForm.title, postForm.contents, image, loginMember, LocalDateTime.now());
-        long post_id = postService.save(post);
+        Post post = Post.of(postForm.title, postForm.contents, image, loginMember, LocalDateTime.now(),
+                postForm.price, PostStatus.SALE);
+        Long post_id = postService.save(post);
 
         return new PostIdDto(post_id);
     }
 
     @GetMapping("/post/{postId}")
-    public PostOneDto getPost(@PathVariable("postId") long postId, HttpServletRequest request) throws Exception{
+    public PostOneDto getPost(@PathVariable("postId") Long postId, HttpServletRequest request) throws Exception{
 
         HttpSession session = request.getSession(false);
         if(session == null || session.getAttribute(SessionConst.LOGIN_MEMBER) == null) {
@@ -119,14 +121,17 @@ public class PostController {
         private String title;
         @NotEmpty
         private String contents;
+        @NotEmpty
         private List<MultipartFile> images;
+        @NotEmpty
+        private String price;
     }
 
     @Data
     static class PostIdDto {
-        private long id;
+        private Long id;
 
-        public PostIdDto(long id) {
+        public PostIdDto(Long id) {
             this.id = id;
         }
     }
