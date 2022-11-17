@@ -24,15 +24,15 @@ public class Chat {
 
     private LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = LAZY)
+    @ManyToOne
     @JoinColumn(name= "chattingRoom_id")
     private ChattingRoom chattingRoom;
 
-    @ManyToOne(fetch = LAZY)
+    @ManyToOne
     @JoinColumn(name = "sender_id")
     private Member sender;
 
-    @ManyToOne(fetch = LAZY)
+    @ManyToOne
     @JoinColumn(name = "receiver_id")
     private Member receiver;
 }
