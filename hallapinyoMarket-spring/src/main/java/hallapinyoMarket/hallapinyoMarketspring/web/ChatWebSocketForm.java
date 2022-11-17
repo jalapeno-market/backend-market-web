@@ -7,7 +7,7 @@ import lombok.Setter;
 public class ChatWebSocketForm {
 
     public enum MessageType {
-        ENTER, TALK, QUIT
+        ENTER, TALK
     }
 
     private MessageType type;

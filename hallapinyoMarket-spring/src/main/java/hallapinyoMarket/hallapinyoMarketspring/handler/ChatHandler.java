@@ -11,6 +11,7 @@ import hallapinyoMarket.hallapinyoMarketspring.web.ChatWebSocketForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -22,6 +23,7 @@ import java.util.Map;
 
 @Slf4j
 @Component
+@Transactional
 @RequiredArgsConstructor
 public class ChatHandler extends TextWebSocketHandler {
 
@@ -33,17 +35,17 @@ public class ChatHandler extends TextWebSocketHandler {
 
     // message
     @Override
+    @Transactional
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         String payload = message.getPayload();
         log.info("payload : " + payload);
 
         ChatWebSocketForm chatWebSocketForm = objectMapper.readValue(payload, ChatWebSocketForm.class);
 
-        if(chatWebSocketForm.getMessage().equals(ChatWebSocketForm.MessageType.ENTER)) {
+        if(chatWebSocketForm.getType().equals(ChatWebSocketForm.MessageType.ENTER)) {
             sessionRoomMap.put(session, chatWebSocketForm.getRoomId());
         }
-        else if(chatWebSocketForm.getMessage().equals(ChatWebSocketForm.MessageType.TALK)) {
-
+        else if(chatWebSocketForm.getType().equals(ChatWebSocketForm.MessageType.TALK)) {
             ChattingRoom chattingRoom = chattingRoomRepository.find(chatWebSocketForm.getRoomId());
             Member sender = memberRepository.find(chatWebSocketForm.getSenderId());
             Member receiver = memberRepository.find(chatWebSocketForm.getReceiverId());
@@ -60,13 +62,10 @@ public class ChatHandler extends TextWebSocketHandler {
             chatRepository.save(chat);
             
             for(WebSocketSession key : sessionRoomMap.keySet()) { // 실시간 채팅 코드
-                if(sessionRoomMap.get(key) == chatWebSocketForm.getRoomId()) { 
+                if(sessionRoomMap.get(key).equals(chatWebSocketForm.getRoomId())) {
                     key.sendMessage(message);
                 }
             }
-        }
-        else {
-            sessionRoomMap.remove(session);
         }
     }
 
@@ -79,6 +78,7 @@ public class ChatHandler extends TextWebSocketHandler {
     // connection closed
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+        sessionRoomMap.remove(session);
         log.info(session + " 클라이언트 해제");
     }
 
