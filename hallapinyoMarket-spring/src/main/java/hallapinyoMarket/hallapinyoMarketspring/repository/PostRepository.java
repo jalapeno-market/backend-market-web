@@ -5,6 +5,7 @@ import hallapinyoMarket.hallapinyoMarketspring.domain.Post;
 import hallapinyoMarket.hallapinyoMarketspring.domain.PostStatus;
 import hallapinyoMarket.hallapinyoMarketspring.domain.QMember;
 import hallapinyoMarket.hallapinyoMarketspring.domain.QPost;
+import hallapinyoMarket.hallapinyoMarketspring.repository.dto.PostIdDto;
 import hallapinyoMarket.hallapinyoMarketspring.repository.dto.PostManyDto;
 import hallapinyoMarket.hallapinyoMarketspring.repository.dto.PostOneDto;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +24,22 @@ public class PostRepository {
         em.persist(post);
     }
 
-    public PostOneDto findOne(Long id) {
-        return PostOneDto.from(em.find(Post.class, id));
+    public Post findOne(Long id) {
+        return em.find(Post.class, id);
+    }
+
+    public List<Post> findAllPostByUserId(String userId, int offset, int limit) {
+        QPost post = QPost.post;
+        JPAQueryFactory query = new JPAQueryFactory(em);
+
+        return query
+                .select(post)
+                .from(post)
+                .where(post.member.userId.eq(userId))
+                .orderBy(post.createdAt.desc())
+                .offset(offset)
+                .limit(limit)
+                .fetch();
     }
 
     public List<Post> findAllPost(int offset, int limit) {
@@ -35,7 +50,8 @@ public class PostRepository {
         return query
                 .select(post)
                 .from(post)
-                .where(QPost.post.status.eq(PostStatus.SALE))
+                .where(post.status.eq(PostStatus.SALE))
+                .orderBy(post.createdAt.desc())
                 .offset(offset)
                 .limit(limit)
                 .fetch();

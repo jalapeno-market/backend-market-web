@@ -1,5 +1,6 @@
 package hallapinyoMarket.hallapinyoMarketspring.controller;
 
+import hallapinyoMarket.hallapinyoMarketspring.repository.dto.PostIdDto;
 import hallapinyoMarket.hallapinyoMarketspring.repository.dto.PostManyDto;
 import hallapinyoMarket.hallapinyoMarketspring.repository.dto.PostOneDto;
 import hallapinyoMarket.hallapinyoMarketspring.controller.login.SessionConst;
@@ -79,7 +80,7 @@ public class PostController {
         return postService.findOne(postId);
     }
 
-    @GetMapping("/post")
+    @GetMapping("/posts")
     public Result getPosts(
             @RequestParam(value = "offset", defaultValue = "0") int offset,
             @RequestParam(value = "limit", defaultValue = "10") int limit,
@@ -94,8 +95,40 @@ public class PostController {
         return new Result(collect);
     }
 
-    private static void validAuthorized(HttpSession session) throws IllegalAccessException {
+    @GetMapping("/posts/{userId}")
+    public Result getPostsOfUserId(
+            @PathVariable("userId") String userId,
+            @RequestParam(value = "offset", defaultValue = "0") int offset,
+            @RequestParam(value = "limit", defaultValue = "10") int limit,
+            HttpServletRequest request) throws Exception
+    {
+        validAuthorized(request.getSession(false));
+        List<Post> posts = postService.findAllByUserId(userId, offset, limit);
+        List<PostManyDto> collect = posts.stream()
+                .map(p -> PostManyDto.from(p))
+                .collect(Collectors.toList());
+
+        return new Result(collect);
+    }
+
+    @PostMapping("/post/status/{postId}")
+    public PostIdDto soldStatusPost(@PathVariable("postId") Long postId, HttpServletRequest request) throws Exception {
+        HttpSession session = request.getSession(false);
+        validAuthorized(session);
+        validPostHost(postService.findOne(postId).getUserId(), session);
+
+        return postService.changeStatus(postId);
+    }
+
+    private void validAuthorized(HttpSession session) throws IllegalAccessException {
         if(session == null || session.getAttribute(SessionConst.LOGIN_MEMBER) == null) {
+            throw new IllegalAccessException("잘못된 접근입니다.");
+        }
+    }
+
+    private void validPostHost(String userId, HttpSession session) throws IllegalAccessException {
+        Member member = (Member) session.getAttribute(SessionConst.LOGIN_MEMBER);
+        if(!member.getUserId().equals(userId)) {
             throw new IllegalAccessException("잘못된 접근입니다.");
         }
     }
@@ -126,14 +159,5 @@ public class PostController {
         private List<MultipartFile> images;
         @NotEmpty
         private String price;
-    }
-
-    @Data
-    static class PostIdDto {
-        private Long id;
-
-        public PostIdDto(Long id) {
-            this.id = id;
-        }
     }
 }
