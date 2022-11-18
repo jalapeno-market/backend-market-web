@@ -31,6 +31,7 @@ public class Post {
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "member_id")
     private Member member;
 
     private String price;

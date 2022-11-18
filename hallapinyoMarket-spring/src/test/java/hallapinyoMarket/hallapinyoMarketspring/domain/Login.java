@@ -32,7 +32,7 @@ public class Login {
     @BeforeEach
     public void joinMember() {
         Member member = new Member();
-        member.setUser_id("test");
+        member.setUserId("test");
         member.setNickname("test");
         member.setPassword("test");
         memberService.join(member);

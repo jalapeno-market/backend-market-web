@@ -13,12 +13,15 @@ public class ChattingRoom {
     @Column(name = "chattingRoom_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
+    @JoinColumn(name = "buyer_id")
     private Member buyer;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
+    @JoinColumn(name = "seller_id")
     private Member seller;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
+    @JoinColumn(name = "post_id")
     private Post post;
 }
