@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static javax.persistence.FetchType.*;
 
@@ -32,4 +33,22 @@ public class Post {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
+
+    private String price;
+
+    @Enumerated(EnumType.STRING)
+    private PostStatus status;
+
+    public static Post of(String title, String contents, Image image, Member member, LocalDateTime createdAt,
+                          String price, PostStatus status) {
+        Post post = new Post();
+        post.setTitle(title);
+        post.setContents(contents);
+        post.setImage(image);
+        post.setMember(member);
+        post.setCreatedAt(createdAt);
+        post.setPrice(price);
+        post.setStatus(status);
+        return post;
+    }
 }
