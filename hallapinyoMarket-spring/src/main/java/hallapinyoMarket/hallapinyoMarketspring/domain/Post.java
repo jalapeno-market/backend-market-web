@@ -16,7 +16,7 @@ public class Post {
     @Id
     @GeneratedValue
     @Column(name = "post_id")
-    private long id;
+    private Long id;
 
     private String title;
 
@@ -30,5 +30,6 @@ public class Post {
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "member_id")
     private Member member;
 }
