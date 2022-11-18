@@ -2,13 +2,8 @@ package hallapinyoMarket.hallapinyoMarketspring.domain;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.web.socket.WebSocketSession;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 @Entity
 @Getter @Setter
@@ -16,7 +11,7 @@ public class ChattingRoom {
 
     @Id @GeneratedValue
     @Column(name = "chattingRoom_id")
-    private long id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "buyer_id")
