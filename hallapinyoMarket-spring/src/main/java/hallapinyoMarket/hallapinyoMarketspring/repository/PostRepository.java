@@ -1,5 +1,4 @@
 package hallapinyoMarket.hallapinyoMarketspring.repository;
-
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import hallapinyoMarket.hallapinyoMarketspring.domain.Post;
 import hallapinyoMarket.hallapinyoMarketspring.domain.PostStatus;
