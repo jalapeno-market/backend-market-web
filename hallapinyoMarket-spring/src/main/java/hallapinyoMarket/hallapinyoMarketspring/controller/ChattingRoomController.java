@@ -3,6 +3,7 @@ package hallapinyoMarket.hallapinyoMarketspring.controller;
 import hallapinyoMarket.hallapinyoMarketspring.domain.ChattingRoom;
 import hallapinyoMarket.hallapinyoMarketspring.domain.Member;
 import hallapinyoMarket.hallapinyoMarketspring.domain.Post;
+import hallapinyoMarket.hallapinyoMarketspring.exception.RestParameterException;
 import hallapinyoMarket.hallapinyoMarketspring.repository.ChattingRoomRepository;
 import hallapinyoMarket.hallapinyoMarketspring.repository.MemberRepository;
 import hallapinyoMarket.hallapinyoMarketspring.repository.PostRepository;
@@ -42,6 +43,15 @@ public class ChattingRoomController {
     public PostIdSendForm createChattingRoomByPost(@PathVariable("post_id") Long post_id, @PathVariable("member_id") Long member_id) {
         Member member = memberRepository.find(member_id);
         Post post = postRepository.find(post_id);
+        List<ChattingRoom> chattingRoomValid = chattingRoomRepository.findByPostIdAndBuyer(post_id, member_id);
+
+        if(member == null || post == null) {
+            throw new RestParameterException();
+        }
+
+        if(!(chattingRoomValid.isEmpty())) {    // 중복 채팅방을 만드려고 할때
+            throw new RestParameterException();
+        }
 
         ChattingRoom chattingRoom = new ChattingRoom();
         chattingRoom.setBuyer(member);
@@ -51,5 +61,14 @@ public class ChattingRoomController {
         PostIdSendForm form = new PostIdSendForm();
         form.setId(chattingRoomRepository.save(chattingRoom));
         return form;
+    }
+
+    @DeleteMapping("ChattingRoom/{chattingRoom_id}") // 해당 채팅룸을 삭제한다.
+    public void deleteChattingRoom(@PathVariable("chattingRoom_id") Long chattingRoom_id) {
+        ChattingRoom chattingRoom = chattingRoomRepository.find(chattingRoom_id);
+        if(chattingRoom == null) {
+            throw new RestParameterException();
+        }
+        chattingRoomRepository.delete(chattingRoom_id);
     }
 }

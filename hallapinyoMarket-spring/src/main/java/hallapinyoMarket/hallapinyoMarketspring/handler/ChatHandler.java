@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import hallapinyoMarket.hallapinyoMarketspring.domain.Chat;
 import hallapinyoMarket.hallapinyoMarketspring.domain.ChattingRoom;
 import hallapinyoMarket.hallapinyoMarketspring.domain.Member;
+import hallapinyoMarket.hallapinyoMarketspring.exception.RestParameterException;
+import hallapinyoMarket.hallapinyoMarketspring.exception.WebSocketJsonException;
 import hallapinyoMarket.hallapinyoMarketspring.repository.ChatRepository;
 import hallapinyoMarket.hallapinyoMarketspring.repository.ChattingRoomRepository;
 import hallapinyoMarket.hallapinyoMarketspring.repository.MemberRepository;
@@ -37,12 +39,28 @@ public class ChatHandler extends TextWebSocketHandler {
     @Override
     @Transactional
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+
         String payload = message.getPayload();
         log.info("payload : " + payload);
 
         ChatWebSocketForm chatWebSocketForm = objectMapper.readValue(payload, ChatWebSocketForm.class);
 
+        if(memberRepository.find(chatWebSocketForm.getReceiverId()) == null ||
+                memberRepository.find(chatWebSocketForm.getSenderId()) == null ||
+                chattingRoomRepository.find(chatWebSocketForm.getRoomId()) == null ||
+                chatWebSocketForm.getReceiverId() == chatWebSocketForm.getSenderId()
+        ) {
+            session.sendMessage(new TextMessage("이상한 ID 값입니다. 웹소켓을 종료합니다."));
+            throw new WebSocketJsonException();
+        }
+
         if(chatWebSocketForm.getType().equals(ChatWebSocketForm.MessageType.ENTER)) {
+            for(WebSocketSession key : sessionRoomMap.keySet()) {
+                if(key == session) {
+                    session.sendMessage(new TextMessage("ENTER를 중복하였습니다. 웹소켓을 종료합니다."));
+                    throw new WebSocketJsonException();
+                }
+            }
             sessionRoomMap.put(session, chatWebSocketForm.getRoomId());
         }
         else if(chatWebSocketForm.getType().equals(ChatWebSocketForm.MessageType.TALK)) {
@@ -66,6 +84,10 @@ public class ChatHandler extends TextWebSocketHandler {
                     key.sendMessage(message);
                 }
             }
+        }
+        else { // Type 값을 이상하게 주었을때
+            new TextMessage("Type 값이 이상합니다. 웹소켓을 종료합니다.");
+            throw new WebSocketJsonException();
         }
     }
 
