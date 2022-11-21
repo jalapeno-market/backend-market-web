@@ -30,7 +30,8 @@
 - [x] post 도메인에 saleStatus 컬럼 추가
   - [x] post 저장, 조회시 saleStatus 정보 추가
 - [x] user_id -> uesrId 변경
-- [ ] dto 매핑 service 계층으로 바꾸기
+- [x] dto 매핑 service 계층으로 바꾸기
+- [x] 회원가입 이미 존재하는 회원 예외 핸들러 처리
 
 ## 예외
 - [ ] 가격 입력값 예외 처리
