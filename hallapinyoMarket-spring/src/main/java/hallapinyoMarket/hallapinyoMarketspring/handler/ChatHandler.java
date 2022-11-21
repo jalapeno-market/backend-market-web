@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import hallapinyoMarket.hallapinyoMarketspring.domain.Chat;
 import hallapinyoMarket.hallapinyoMarketspring.domain.ChattingRoom;
 import hallapinyoMarket.hallapinyoMarketspring.domain.Member;
-import hallapinyoMarket.hallapinyoMarketspring.exception.RestParameterException;
 import hallapinyoMarket.hallapinyoMarketspring.exception.WebSocketJsonException;
 import hallapinyoMarket.hallapinyoMarketspring.repository.ChatRepository;
 import hallapinyoMarket.hallapinyoMarketspring.repository.ChattingRoomRepository;
