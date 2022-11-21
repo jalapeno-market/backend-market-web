@@ -1,8 +1,8 @@
 package hallapinyoMarket.hallapinyoMarketspring.controller;
 
-import hallapinyoMarket.hallapinyoMarketspring.repository.dto.PostIdDto;
-import hallapinyoMarket.hallapinyoMarketspring.repository.dto.PostManyDto;
-import hallapinyoMarket.hallapinyoMarketspring.repository.dto.PostOneDto;
+import hallapinyoMarket.hallapinyoMarketspring.service.dto.PostIdDto;
+import hallapinyoMarket.hallapinyoMarketspring.service.dto.PostManyDto;
+import hallapinyoMarket.hallapinyoMarketspring.service.dto.PostOneDto;
 import hallapinyoMarket.hallapinyoMarketspring.controller.login.SessionConst;
 import hallapinyoMarket.hallapinyoMarketspring.domain.Image;
 import hallapinyoMarket.hallapinyoMarketspring.domain.Member;

@@ -2,12 +2,10 @@ package hallapinyoMarket.hallapinyoMarketspring.controller;
 
 import hallapinyoMarket.hallapinyoMarketspring.domain.Member;
 import hallapinyoMarket.hallapinyoMarketspring.service.MemberService;
+import hallapinyoMarket.hallapinyoMarketspring.service.dto.MemberProfileDto;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -21,6 +19,11 @@ public class MemberController {
     public MemberJoinDto saveMember(@RequestBody @Valid Member member) {
         String user_id = memberService.join(member);
         return new MemberJoinDto(user_id);
+    }
+
+    @GetMapping("/members/{userId}")
+    public MemberProfileDto getMemberProfile(@PathVariable("userId") String userId) {
+        return memberService.findMemberProfile(userId);
     }
 
     @Data

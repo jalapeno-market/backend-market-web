@@ -42,7 +42,7 @@ public class ChattingRoomController {
     @PostMapping("member/{member_id}/post/{post_id}/ChattingRoom") // 해당 포스트를 이용해 채팅룸을 생성한다.
     public PostIdSendForm createChattingRoomByPost(@PathVariable("post_id") Long post_id, @PathVariable("member_id") Long member_id) {
         Member member = memberRepository.find(member_id);
-        Post post = postRepository.find(post_id);
+        Post post = postRepository.findOne(post_id);
         List<ChattingRoom> chattingRoomValid = chattingRoomRepository.findByPostIdAndBuyer(post_id, member_id);
 
         if(member == null || post == null) {
