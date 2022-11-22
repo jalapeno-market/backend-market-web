@@ -118,6 +118,15 @@ public class PostController {
         return new Result(postService.changeStatus(postId));
     }
 
+    @DeleteMapping("/post/{postId}")
+    public Result deletePost(@PathVariable("postId") Long postId, HttpServletRequest request) throws Exception {
+        HttpSession session = request.getSession(false);
+        validAuthorized(session);
+        validPostHost(postService.findOne(postId).getUserId(), session);
+
+        return new Result(postService.deleteOne(postId));
+    }
+
     private void validAuthorized(HttpSession session) throws IllegalAccessException {
         if(session == null || session.getAttribute(SessionConst.LOGIN_MEMBER) == null) {
             throw new IllegalAccessException("잘못된 접근입니다.");

@@ -48,4 +48,11 @@ public class PostService {
     public List<Post> findAll(int offset, int limit) {
         return postRepository.findAllPost(offset, limit);
     }
+
+    @Transactional
+    public PostIdDto deleteOne(Long postId) {
+        Post findPost = postRepository.findOne(postId);
+        postRepository.deletePost(findPost);
+        return new PostIdDto(findPost.getId());
+    }
 }

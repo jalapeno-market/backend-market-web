@@ -66,4 +66,8 @@ public class PostRepository {
                 .limit(limit)
                 .fetch();
     }
+
+    public void deletePost(Post post) {
+        em.remove(post);
+    }
 }
