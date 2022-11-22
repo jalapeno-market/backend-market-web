@@ -2,7 +2,6 @@ package hallapinyoMarket.hallapinyoMarketspring.controller;
 
 import hallapinyoMarket.hallapinyoMarketspring.service.dto.PostIdDto;
 import hallapinyoMarket.hallapinyoMarketspring.service.dto.PostManyDto;
-import hallapinyoMarket.hallapinyoMarketspring.service.dto.PostOneDto;
 import hallapinyoMarket.hallapinyoMarketspring.controller.login.SessionConst;
 import hallapinyoMarket.hallapinyoMarketspring.domain.Image;
 import hallapinyoMarket.hallapinyoMarketspring.domain.Member;
@@ -11,7 +10,6 @@ import hallapinyoMarket.hallapinyoMarketspring.domain.PostStatus;
 import hallapinyoMarket.hallapinyoMarketspring.exception.exhandler.ErrorResult;
 import hallapinyoMarket.hallapinyoMarketspring.service.PostService;
 import hallapinyoMarket.hallapinyoMarketspring.service.S3UploaderService;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +49,7 @@ public class PostController {
     }
 
     @PostMapping("/post/save")
-    public PostIdDto savePost(@ModelAttribute @Valid PostForm postForm, HttpServletRequest request) throws Exception {
+    public Result savePost(@ModelAttribute @Valid PostForm postForm, HttpServletRequest request) throws Exception {
 
         HttpSession session = request.getSession(false);
         validAuthorized(session);
@@ -70,14 +68,14 @@ public class PostController {
                 postForm.price, PostStatus.SALE);
         Long post_id = postService.save(post);
 
-        return new PostIdDto(post_id);
+        return new Result(new PostIdDto(post_id));
     }
 
     @GetMapping("/post/{postId}")
-    public PostOneDto getPost(@PathVariable("postId") Long postId, HttpServletRequest request) throws Exception{
+    public Result getPost(@PathVariable("postId") Long postId, HttpServletRequest request) throws Exception{
 
         validAuthorized(request.getSession(false));
-        return postService.findOne(postId);
+        return new Result(postService.findOne(postId));
     }
 
     @GetMapping("/posts")
@@ -112,12 +110,12 @@ public class PostController {
     }
 
     @PostMapping("/post/status/{postId}")
-    public PostIdDto soldStatusPost(@PathVariable("postId") Long postId, HttpServletRequest request) throws Exception {
+    public Result soldStatusPost(@PathVariable("postId") Long postId, HttpServletRequest request) throws Exception {
         HttpSession session = request.getSession(false);
         validAuthorized(session);
         validPostHost(postService.findOne(postId).getUserId(), session);
 
-        return postService.changeStatus(postId);
+        return new Result(postService.changeStatus(postId));
     }
 
     private void validAuthorized(HttpSession session) throws IllegalAccessException {
@@ -141,12 +139,6 @@ public class PostController {
         } else {
             return new Image(saveImageNames.get(0));
         }
-    }
-
-    @Data
-    @AllArgsConstructor
-    static class Result<T> {
-        private T data;
     }
 
     @Data

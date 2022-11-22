@@ -3,7 +3,6 @@ package hallapinyoMarket.hallapinyoMarketspring.controller;
 import hallapinyoMarket.hallapinyoMarketspring.domain.Member;
 import hallapinyoMarket.hallapinyoMarketspring.exception.exhandler.ErrorResult;
 import hallapinyoMarket.hallapinyoMarketspring.service.MemberService;
-import hallapinyoMarket.hallapinyoMarketspring.service.dto.MemberProfileDto;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,14 +26,14 @@ public class MemberController {
     }
 
     @PostMapping("/members/join")
-    public MemberJoinDto saveMember(@RequestBody @Valid Member member) {
+    public Result saveMember(@RequestBody @Valid Member member) {
         String user_id = memberService.join(member);
-        return new MemberJoinDto(user_id);
+        return new Result(new MemberJoinDto(user_id));
     }
 
     @GetMapping("/members/{userId}")
-    public MemberProfileDto getMemberProfile(@PathVariable("userId") String userId) {
-        return memberService.findMemberProfile(userId);
+    public Result getMemberProfile(@PathVariable("userId") String userId) {
+        return new Result(memberService.findMemberProfile(userId));
     }
 
     @Data

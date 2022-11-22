@@ -1,5 +1,6 @@
 package hallapinyoMarket.hallapinyoMarketspring.controller.login;
 
+import hallapinyoMarket.hallapinyoMarketspring.controller.Result;
 import hallapinyoMarket.hallapinyoMarketspring.domain.Member;
 import hallapinyoMarket.hallapinyoMarketspring.exception.exhandler.ErrorResult;
 import hallapinyoMarket.hallapinyoMarketspring.service.LoginService;
@@ -45,8 +46,8 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public MemberDto login(@RequestBody @Valid LoginForm form, BindingResult bindingResult,
-                           HttpServletRequest request) throws LoginException {
+    public Result login(@RequestBody @Valid LoginForm form, BindingResult bindingResult,
+                        HttpServletRequest request) throws LoginException {
 
         if(bindingResult.hasErrors()) {
             throw new IllegalArgumentException("잘못된 입력 값");
@@ -61,7 +62,7 @@ public class LoginController {
         HttpSession session = request.getSession();
         session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember);
 
-        return new MemberDto(loginMember.getUserId(), loginMember.getNickname());
+        return new Result(new MemberDto(loginMember.getUserId(), loginMember.getNickname()));
     }
 
 
