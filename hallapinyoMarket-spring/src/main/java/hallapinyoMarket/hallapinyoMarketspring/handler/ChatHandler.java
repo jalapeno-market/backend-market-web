@@ -1,18 +1,24 @@
 package hallapinyoMarket.hallapinyoMarketspring.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hallapinyoMarket.hallapinyoMarketspring.controller.login.SessionConst;
 import hallapinyoMarket.hallapinyoMarketspring.domain.Chat;
 import hallapinyoMarket.hallapinyoMarketspring.domain.ChattingRoom;
 import hallapinyoMarket.hallapinyoMarketspring.domain.Member;
+import hallapinyoMarket.hallapinyoMarketspring.exception.RestParameterSelfException;
 import hallapinyoMarket.hallapinyoMarketspring.exception.WebSocketJsonException;
+import hallapinyoMarket.hallapinyoMarketspring.exception.exhandler.ErrorResult;
 import hallapinyoMarket.hallapinyoMarketspring.repository.ChatRepository;
 import hallapinyoMarket.hallapinyoMarketspring.repository.ChattingRoomRepository;
 import hallapinyoMarket.hallapinyoMarketspring.repository.MemberRepository;
 import hallapinyoMarket.hallapinyoMarketspring.web.ChatWebSocketForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -21,6 +27,8 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+
+import static hallapinyoMarket.hallapinyoMarketspring.controller.login.SessionConst.LOGIN_MEMBER;
 
 @Slf4j
 @Component
@@ -34,38 +42,65 @@ public class ChatHandler extends TextWebSocketHandler {
     private final ChattingRoomRepository chattingRoomRepository;
     private final MemberRepository memberRepository;
 
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(IllegalAccessException.class)
+    public ErrorResult illegalAccessHandle(IllegalAccessException e) {
+        log.error("[exceptionHandle] ex", e);
+        return new ErrorResult("UNAUTHORIZED", e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ErrorResult illegalExHandle(IllegalArgumentException e) {
+        log.error("[exceptionHandle] ex", e);
+        return new ErrorResult("BAD", e.getMessage());
+    }
     // message
     @Override
     @Transactional
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+
+        Member m = (Member) session.getAttributes().get(LOGIN_MEMBER);
 
         String payload = message.getPayload();
         log.info("payload : " + payload);
 
         ChatWebSocketForm chatWebSocketForm = objectMapper.readValue(payload, ChatWebSocketForm.class);
 
-        if(memberRepository.find(chatWebSocketForm.getReceiverId()) == null ||
-                memberRepository.find(chatWebSocketForm.getSenderId()) == null ||
+        Long myRoomId = chatWebSocketForm.getRoomId();
+        Long mySenderId = m.getId();
+        Long myReceiverId = chattingRoomRepository.findReceiverIdByRoomIdAndSenderId(myRoomId, mySenderId);
+
+        if(memberRepository.find(myReceiverId) == null ||
+                memberRepository.find(mySenderId) == null ||
                 chattingRoomRepository.find(chatWebSocketForm.getRoomId()) == null ||
-                chatWebSocketForm.getReceiverId() == chatWebSocketForm.getSenderId()
+                myReceiverId == mySenderId
         ) {
-            session.sendMessage(new TextMessage("이상한 ID 값입니다. 웹소켓을 종료합니다."));
+            session.sendMessage(new TextMessage("{\n" +
+                    " \"type\" : \"ERROR\",\n" +
+                    " \"roomId\" : 0,\n" +
+                    " \"message\" : \"이상한 ID 값입니다. 웹소켓을 종료합니다.\"\n" +
+                    "}"));
             throw new WebSocketJsonException();
         }
 
-        if(chatWebSocketForm.getType().equals(ChatWebSocketForm.MessageType.ENTER)) {
+        if(chatWebSocketForm.getType().equals("ENTER")) {
             for(WebSocketSession key : sessionRoomMap.keySet()) {
                 if(key == session) {
-                    session.sendMessage(new TextMessage("ENTER를 중복하였습니다. 웹소켓을 종료합니다."));
+                    session.sendMessage(new TextMessage("{\n" +
+                            " \"type\" : \"ERROR\",\n" +
+                            " \"roomId\" : 0,\n" +
+                            " \"message\" : \"ENTER를 중복하였습니다. 웹소켓을 종료합니다.\"\n" +
+                            "}"));
                     throw new WebSocketJsonException();
                 }
             }
             sessionRoomMap.put(session, chatWebSocketForm.getRoomId());
         }
-        else if(chatWebSocketForm.getType().equals(ChatWebSocketForm.MessageType.TALK)) {
+        else if(chatWebSocketForm.getType().equals("TALK")) {
             ChattingRoom chattingRoom = chattingRoomRepository.find(chatWebSocketForm.getRoomId());
-            Member sender = memberRepository.find(chatWebSocketForm.getSenderId());
-            Member receiver = memberRepository.find(chatWebSocketForm.getReceiverId());
+            Member sender = memberRepository.find(mySenderId);
+            Member receiver = memberRepository.find(myReceiverId);
 
 
             Chat chat = new Chat();
@@ -85,7 +120,11 @@ public class ChatHandler extends TextWebSocketHandler {
             }
         }
         else { // Type 값을 이상하게 주었을때
-            new TextMessage("Type 값이 이상합니다. 웹소켓을 종료합니다.");
+            session.sendMessage(new TextMessage("{\n" +
+                    " \"type\" : \"ERROR\",\n" +
+                    " \"roomId\" : 0,\n" +
+                    " \"message\" : \"TYPE 값이 이상합니다. 웹소켓을 종료합니다.\"\n" +
+                    "}"));
             throw new WebSocketJsonException();
         }
     }
