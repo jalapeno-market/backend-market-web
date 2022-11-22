@@ -1,5 +1,6 @@
 package hallapinyoMarket.hallapinyoMarketspring.controller;
 
+import hallapinyoMarket.hallapinyoMarketspring.controller.form.PostForm;
 import hallapinyoMarket.hallapinyoMarketspring.service.dto.PostIdDto;
 import hallapinyoMarket.hallapinyoMarketspring.service.dto.PostManyDto;
 import hallapinyoMarket.hallapinyoMarketspring.controller.login.SessionConst;
@@ -53,22 +54,18 @@ public class PostController {
 
         HttpSession session = request.getSession(false);
         validAuthorized(session);
-
-        List<String> saveImageNames = new ArrayList<>();
-        for (MultipartFile image : postForm.getImages()) {
-            saveImageNames.add(s3UploaderService.upload(image, "myawsbucketset", "static"));
-        }
-        if(saveImageNames.size() < 1 || saveImageNames.size() > 3) {
-            throw new IllegalArgumentException("잘못된 입력입니다.");
-        }
-
+        validateImagesSize(postForm.getImages());
         Member loginMember = (Member) session.getAttribute(SessionConst.LOGIN_MEMBER);
-        Image image = getImageInstance(saveImageNames);
-        Post post = Post.of(postForm.title, postForm.contents, image, loginMember, LocalDateTime.now(),
-                postForm.price, PostStatus.SALE);
-        Long post_id = postService.save(post);
+
+        Long post_id = postService.save(postForm, loginMember);
 
         return new Result(new PostIdDto(post_id));
+    }
+
+    private static void validateImagesSize(List<MultipartFile> images) {
+        if(images.size() < 1 || images.size() > 3) {
+            throw new IllegalArgumentException("잘못된 입력입니다.");
+        }
     }
 
     @GetMapping("/post/{postId}")
@@ -112,7 +109,6 @@ public class PostController {
     @PostMapping("/post/status/{postId}")
     public Result soldStatusPost(@PathVariable("postId") Long postId, HttpServletRequest request) throws Exception {
         HttpSession session = request.getSession(false);
-        validAuthorized(session);
         validPostHost(postService.findOne(postId).getUserId(), session);
 
         return new Result(postService.changeStatus(postId));
@@ -121,11 +117,21 @@ public class PostController {
     @DeleteMapping("/post/{postId}")
     public Result deletePost(@PathVariable("postId") Long postId, HttpServletRequest request) throws Exception {
         HttpSession session = request.getSession(false);
-        validAuthorized(session);
         validPostHost(postService.findOne(postId).getUserId(), session);
 
         return new Result(postService.deleteOne(postId));
     }
+
+/*    @PatchMapping("/post/{postId}")
+    public Result updatePost(@ModelAttribute @Valid PostForm postForm,
+                             @PathVariable("postId") Long postId,
+                             HttpServletRequest request) throws Exception {
+        HttpSession session = request.getSession(false);
+        validPostHost(postService.findOne(postId).getUserId(), session);
+        validateImagesSize(postForm.getImages());
+
+        return new Result(postService.updatePost(postForm, ))
+    }*/
 
     private void validAuthorized(HttpSession session) throws IllegalAccessException {
         if(session == null || session.getAttribute(SessionConst.LOGIN_MEMBER) == null) {
@@ -134,31 +140,10 @@ public class PostController {
     }
 
     private void validPostHost(String userId, HttpSession session) throws IllegalAccessException {
+        validAuthorized(session);
         Member member = (Member) session.getAttribute(SessionConst.LOGIN_MEMBER);
         if(!member.getUserId().equals(userId)) {
             throw new IllegalAccessException("잘못된 접근입니다.");
         }
-    }
-
-    private Image getImageInstance(List<String> saveImageNames) { //리팩토링 하기
-        if(saveImageNames.size() == 3) {
-            return new Image(saveImageNames.get(0), saveImageNames.get(1), saveImageNames.get(2));
-        } else if(saveImageNames.size() == 2) {
-            return new Image(saveImageNames.get(0), saveImageNames.get(1));
-        } else {
-            return new Image(saveImageNames.get(0));
-        }
-    }
-
-    @Data
-    static class PostForm {
-        @NotEmpty
-        private String title;
-        @NotEmpty
-        private String contents;
-        @NotEmpty
-        private List<MultipartFile> images;
-        @NotEmpty
-        private String price;
     }
 }
