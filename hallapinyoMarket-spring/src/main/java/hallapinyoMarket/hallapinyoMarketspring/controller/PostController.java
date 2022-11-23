@@ -49,7 +49,7 @@ public class PostController {
         return new ErrorResult("BAD", e.getMessage());
     }
 
-    @PostMapping("/post/save")
+    @PostMapping("/post")
     public Result savePost(@ModelAttribute @Valid PostForm postForm, HttpServletRequest request) throws Exception {
 
         HttpSession session = request.getSession(false);
