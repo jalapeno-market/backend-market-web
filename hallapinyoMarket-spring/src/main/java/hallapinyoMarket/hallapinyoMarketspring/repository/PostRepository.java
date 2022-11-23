@@ -4,9 +4,6 @@ import hallapinyoMarket.hallapinyoMarketspring.domain.Post;
 import hallapinyoMarket.hallapinyoMarketspring.domain.PostStatus;
 import hallapinyoMarket.hallapinyoMarketspring.domain.QMember;
 import hallapinyoMarket.hallapinyoMarketspring.domain.QPost;
-import hallapinyoMarket.hallapinyoMarketspring.repository.dto.PostIdDto;
-import hallapinyoMarket.hallapinyoMarketspring.repository.dto.PostManyDto;
-import hallapinyoMarket.hallapinyoMarketspring.repository.dto.PostOneDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -25,6 +22,20 @@ public class PostRepository {
 
     public Post findOne(Long id) {
         return em.find(Post.class, id);
+    }
+
+    public int countPostByUserId(String userId) {
+        QPost post = QPost.post;
+        QMember member = QMember.member;
+        JPAQueryFactory query = new JPAQueryFactory(em);
+        List<Post> postsByUserId = query
+                .select(post)
+                .from(post)
+                .join(post.member, member)
+                .where(post.member.userId.eq(userId))
+                .fetch();
+
+        return postsByUserId.size();
     }
 
     public List<Post> findAllPostByUserId(String userId, int offset, int limit) {
@@ -54,5 +65,9 @@ public class PostRepository {
                 .offset(offset)
                 .limit(limit)
                 .fetch();
+    }
+
+    public void deletePost(Post post) {
+        em.remove(post);
     }
 }

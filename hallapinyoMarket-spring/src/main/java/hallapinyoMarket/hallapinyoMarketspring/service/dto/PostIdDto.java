@@ -1,4 +1,4 @@
-package hallapinyoMarket.hallapinyoMarketspring.repository.dto;
+package hallapinyoMarket.hallapinyoMarketspring.service.dto;
 
 import hallapinyoMarket.hallapinyoMarketspring.domain.Post;
 import lombok.Data;

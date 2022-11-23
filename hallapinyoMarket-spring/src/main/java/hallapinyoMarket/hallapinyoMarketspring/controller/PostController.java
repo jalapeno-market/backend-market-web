@@ -1,8 +1,8 @@
 package hallapinyoMarket.hallapinyoMarketspring.controller;
 
-import hallapinyoMarket.hallapinyoMarketspring.repository.dto.PostIdDto;
-import hallapinyoMarket.hallapinyoMarketspring.repository.dto.PostManyDto;
-import hallapinyoMarket.hallapinyoMarketspring.repository.dto.PostOneDto;
+import hallapinyoMarket.hallapinyoMarketspring.controller.form.PostForm;
+import hallapinyoMarket.hallapinyoMarketspring.service.dto.PostIdDto;
+import hallapinyoMarket.hallapinyoMarketspring.service.dto.PostManyDto;
 import hallapinyoMarket.hallapinyoMarketspring.controller.login.SessionConst;
 import hallapinyoMarket.hallapinyoMarketspring.domain.Image;
 import hallapinyoMarket.hallapinyoMarketspring.domain.Member;
@@ -11,7 +11,6 @@ import hallapinyoMarket.hallapinyoMarketspring.domain.PostStatus;
 import hallapinyoMarket.hallapinyoMarketspring.exception.exhandler.ErrorResult;
 import hallapinyoMarket.hallapinyoMarketspring.service.PostService;
 import hallapinyoMarket.hallapinyoMarketspring.service.S3UploaderService;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,33 +50,29 @@ public class PostController {
     }
 
     @PostMapping("/post/save")
-    public PostIdDto savePost(@ModelAttribute @Valid PostForm postForm, HttpServletRequest request) throws Exception {
+    public Result savePost(@ModelAttribute @Valid PostForm postForm, HttpServletRequest request) throws Exception {
 
         HttpSession session = request.getSession(false);
         validAuthorized(session);
+        validateImagesSize(postForm.getImages());
+        Member loginMember = (Member) session.getAttribute(SessionConst.LOGIN_MEMBER);
 
-        List<String> saveImageNames = new ArrayList<>();
-        for (MultipartFile image : postForm.getImages()) {
-            saveImageNames.add(s3UploaderService.upload(image, "myawsbucketset", "static"));
-        }
-        if(saveImageNames.size() < 1 || saveImageNames.size() > 3) {
+        Long post_id = postService.save(postForm, loginMember);
+
+        return new Result(new PostIdDto(post_id));
+    }
+
+    private static void validateImagesSize(List<MultipartFile> images) {
+        if(images.size() < 1 || images.size() > 3) {
             throw new IllegalArgumentException("잘못된 입력입니다.");
         }
-
-        Member loginMember = (Member) session.getAttribute(SessionConst.LOGIN_MEMBER);
-        Image image = getImageInstance(saveImageNames);
-        Post post = Post.of(postForm.title, postForm.contents, image, loginMember, LocalDateTime.now(),
-                postForm.price, PostStatus.SALE);
-        Long post_id = postService.save(post);
-
-        return new PostIdDto(post_id);
     }
 
     @GetMapping("/post/{postId}")
-    public PostOneDto getPost(@PathVariable("postId") Long postId, HttpServletRequest request) throws Exception{
+    public Result getPost(@PathVariable("postId") Long postId, HttpServletRequest request) throws Exception{
 
         validAuthorized(request.getSession(false));
-        return postService.findOne(postId);
+        return new Result(postService.findOne(postId));
     }
 
     @GetMapping("/posts")
@@ -112,13 +107,31 @@ public class PostController {
     }
 
     @PostMapping("/post/status/{postId}")
-    public PostIdDto soldStatusPost(@PathVariable("postId") Long postId, HttpServletRequest request) throws Exception {
+    public Result soldStatusPost(@PathVariable("postId") Long postId, HttpServletRequest request) throws Exception {
         HttpSession session = request.getSession(false);
-        validAuthorized(session);
         validPostHost(postService.findOne(postId).getUserId(), session);
 
-        return postService.changeStatus(postId);
+        return new Result(postService.changeStatus(postId));
     }
+
+    @DeleteMapping("/post/{postId}")
+    public Result deletePost(@PathVariable("postId") Long postId, HttpServletRequest request) throws Exception {
+        HttpSession session = request.getSession(false);
+        validPostHost(postService.findOne(postId).getUserId(), session);
+
+        return new Result(postService.deleteOne(postId));
+    }
+
+/*    @PatchMapping("/post/{postId}")
+    public Result updatePost(@ModelAttribute @Valid PostForm postForm,
+                             @PathVariable("postId") Long postId,
+                             HttpServletRequest request) throws Exception {
+        HttpSession session = request.getSession(false);
+        validPostHost(postService.findOne(postId).getUserId(), session);
+        validateImagesSize(postForm.getImages());
+
+        return new Result(postService.updatePost(postForm, ))
+    }*/
 
     private void validAuthorized(HttpSession session) throws IllegalAccessException {
         if(session == null || session.getAttribute(SessionConst.LOGIN_MEMBER) == null) {
@@ -127,37 +140,10 @@ public class PostController {
     }
 
     private void validPostHost(String userId, HttpSession session) throws IllegalAccessException {
+        validAuthorized(session);
         Member member = (Member) session.getAttribute(SessionConst.LOGIN_MEMBER);
         if(!member.getUserId().equals(userId)) {
             throw new IllegalAccessException("잘못된 접근입니다.");
         }
-    }
-
-    private Image getImageInstance(List<String> saveImageNames) { //리팩토링 하기
-        if(saveImageNames.size() == 3) {
-            return new Image(saveImageNames.get(0), saveImageNames.get(1), saveImageNames.get(2));
-        } else if(saveImageNames.size() == 2) {
-            return new Image(saveImageNames.get(0), saveImageNames.get(1));
-        } else {
-            return new Image(saveImageNames.get(0));
-        }
-    }
-
-    @Data
-    @AllArgsConstructor
-    static class Result<T> {
-        private T data;
-    }
-
-    @Data
-    static class PostForm {
-        @NotEmpty
-        private String title;
-        @NotEmpty
-        private String contents;
-        @NotEmpty
-        private List<MultipartFile> images;
-        @NotEmpty
-        private String price;
     }
 }

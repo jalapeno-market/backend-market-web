@@ -3,8 +3,8 @@
 - [x] 모든 기능 로그인한 회원만 접근 가능
 
 ## 멤버
-- [ ] 멤버 조회 기능
-  - [ ] nickname, userId, post 작성 개수
+- [x] 멤버 조회 기능
+  - [x] nickname, userId, post 작성 개수
 
 ## 게시물
 - [x] 게시물 저장
@@ -20,6 +20,8 @@
     - [x] 1번 사진만 전송
 - [x] 게시물 상태 변경 요청
   - [x] 자신의 게시물만 가능
+- [x] 게시물 삭제
+- [ ] 게시물 수정
 
 ## fix
 - [x] long이 아니라 Long 사용해야 함
@@ -28,7 +30,10 @@
 - [x] post 도메인에 saleStatus 컬럼 추가
   - [x] post 저장, 조회시 saleStatus 정보 추가
 - [x] user_id -> uesrId 변경
-- [ ] dto 매핑 service 계층으로 바꾸기
+- [x] dto 매핑 service 계층으로 바꾸기
+- [x] 회원가입 이미 존재하는 회원 예외 핸들러 처리
+- [ ] post delete 요청 시 s3에서 사진삭제는 안 됨
+- [ ] 게시물 수정 시 사진 update 처리 로직을 잘 모르겠음
 
 ## 예외
 - [ ] 가격 입력값 예외 처리
