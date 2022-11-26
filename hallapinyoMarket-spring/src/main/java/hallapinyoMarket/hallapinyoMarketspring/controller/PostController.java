@@ -32,7 +32,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class PostController {
 
-    private final S3UploaderService s3UploaderService;
     private final PostService postService;
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
@@ -49,7 +48,7 @@ public class PostController {
         return new ErrorResult("BAD", e.getMessage());
     }
 
-    @PostMapping("/post/save")
+    @PostMapping("/post")
     public Result savePost(@ModelAttribute @Valid PostForm postForm, HttpServletRequest request) throws Exception {
 
         HttpSession session = request.getSession(false);
@@ -82,10 +81,7 @@ public class PostController {
             HttpServletRequest request) throws Exception
     {
         validAuthorized(request.getSession(false));
-        List<Post> posts = postService.findAll(offset, limit);
-        List<PostManyDto> collect = posts.stream()
-                .map(p -> PostManyDto.from(p))
-                .collect(Collectors.toList());
+        List<PostManyDto> collect = postService.findAll(offset, limit);
 
         return new Result(collect);
     }
@@ -98,10 +94,7 @@ public class PostController {
             HttpServletRequest request) throws Exception
     {
         validAuthorized(request.getSession(false));
-        List<Post> posts = postService.findAllByUserId(userId, offset, limit);
-        List<PostManyDto> collect = posts.stream()
-                .map(p -> PostManyDto.from(p))
-                .collect(Collectors.toList());
+        List<PostManyDto> collect = postService.findAllByUserId(userId, offset, limit);
 
         return new Result(collect);
     }
