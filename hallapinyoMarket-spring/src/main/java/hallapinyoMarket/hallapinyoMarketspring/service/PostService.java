@@ -7,6 +7,7 @@ import hallapinyoMarket.hallapinyoMarketspring.domain.Post;
 import hallapinyoMarket.hallapinyoMarketspring.domain.PostStatus;
 import hallapinyoMarket.hallapinyoMarketspring.repository.PostRepository;
 import hallapinyoMarket.hallapinyoMarketspring.service.dto.PostIdDto;
+import hallapinyoMarket.hallapinyoMarketspring.service.dto.PostManyDto;
 import hallapinyoMarket.hallapinyoMarketspring.service.dto.PostOneDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -57,8 +59,9 @@ public class PostService {
     }
 
     @Transactional
-    public List<Post> findAllByUserId(String userId, int offset, int limit) {
-        return postRepository.findAllPostByUserId(userId, offset, limit);
+    public List<PostManyDto> findAllByUserId(String userId, int offset, int limit) {
+        List<Post> posts = postRepository.findAllPostByUserId(userId, offset, limit);
+        return getPostManyDtos(posts);
     }
 
     @Transactional
@@ -77,8 +80,9 @@ public class PostService {
         return PostOneDto.from(postRepository.findOne(postId));
     }
 
-    public List<Post> findAll(int offset, int limit) {
-        return postRepository.findAllPost(offset, limit);
+    public List<PostManyDto> findAll(int offset, int limit) {
+        List<Post> posts = postRepository.findAllPost(offset, limit);
+        return getPostManyDtos(posts);
     }
 
     @Transactional
@@ -86,6 +90,12 @@ public class PostService {
         Post findPost = postRepository.findOne(postId);
         postRepository.deletePost(findPost);
         return new PostIdDto(findPost.getId());
+    }
+
+    private List<PostManyDto> getPostManyDtos(List<Post> posts) {
+        return posts.stream()
+                .map(p -> PostManyDto.from(p))
+                .collect(Collectors.toList());
     }
 
 /*    @Transactional
