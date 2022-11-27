@@ -7,5 +7,6 @@ import lombok.Setter;
 public class ChatWebSocketForm {
     private String type;
     private Long roomId;
+    private String senderUserId;
     private String message;
 }

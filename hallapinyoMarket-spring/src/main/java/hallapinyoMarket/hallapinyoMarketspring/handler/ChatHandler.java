@@ -59,18 +59,25 @@ public class ChatHandler extends TextWebSocketHandler {
     @Override
     @Transactional
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-
         Member m = (Member) session.getAttributes().get(LOGIN_MEMBER);
-
         String payload = message.getPayload();
-        log.info("payload : " + payload);
 
+        log.info("payload : " + payload);
         ChatWebSocketForm chatWebSocketForm = objectMapper.readValue(payload, ChatWebSocketForm.class);
+
+        if(m == null) {
+            session.sendMessage(new TextMessage("{\n" +
+                    " \"type\" : \"ERROR\",\n" +
+                    " \"roomId\" : 0,\n" +
+                    " \"senderUserId\" : \"\",\n" +
+                    " \"message\" : \"이상한 세션 값입니다. 웹 소켓을 종료합니다.\"\n" +
+                    "}"));
+            throw new WebSocketJsonException();
+        }
 
         Long myRoomId = chatWebSocketForm.getRoomId();
         Long mySenderId = m.getId();
         Long myReceiverId = chattingRoomRepository.findReceiverIdByRoomIdAndSenderId(myRoomId, mySenderId);
-
         if(memberRepository.find(myReceiverId) == null ||
                 memberRepository.find(mySenderId) == null ||
                 chattingRoomRepository.find(chatWebSocketForm.getRoomId()) == null ||
@@ -79,7 +86,18 @@ public class ChatHandler extends TextWebSocketHandler {
             session.sendMessage(new TextMessage("{\n" +
                     " \"type\" : \"ERROR\",\n" +
                     " \"roomId\" : 0,\n" +
+                    " \"senderUserId\" : \"\",\n" +
                     " \"message\" : \"이상한 ID 값입니다. 웹소켓을 종료합니다.\"\n" +
+                    "}"));
+            throw new WebSocketJsonException();
+        }
+
+        if(!(m.getUserId().equals(chatWebSocketForm.getSenderUserId()))) {
+            session.sendMessage(new TextMessage("{\n" +
+                    " \"type\" : \"ERROR\",\n" +
+                    " \"roomId\" : 0,\n" +
+                    " \"senderUserId\" : \"\",\n" +
+                    " \"message\" : \"이상한 senderUserId 값입니다. 웹소켓을 종료합니다.\"\n" +
                     "}"));
             throw new WebSocketJsonException();
         }
@@ -90,6 +108,7 @@ public class ChatHandler extends TextWebSocketHandler {
                     session.sendMessage(new TextMessage("{\n" +
                             " \"type\" : \"ERROR\",\n" +
                             " \"roomId\" : 0,\n" +
+                            " \"senderUserId\" : \"\",\n" +
                             " \"message\" : \"ENTER를 중복하였습니다. 웹소켓을 종료합니다.\"\n" +
                             "}"));
                     throw new WebSocketJsonException();
@@ -123,6 +142,7 @@ public class ChatHandler extends TextWebSocketHandler {
             session.sendMessage(new TextMessage("{\n" +
                     " \"type\" : \"ERROR\",\n" +
                     " \"roomId\" : 0,\n" +
+                    " \"senderUserId\" : \"\",\n" +
                     " \"message\" : \"TYPE 값이 이상합니다. 웹소켓을 종료합니다.\"\n" +
                     "}"));
             throw new WebSocketJsonException();
