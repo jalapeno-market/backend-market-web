@@ -72,4 +72,18 @@ public class ChattingRoomRepository {
                 .setParameter("buyer_id", buyer_id)
                 .getResultList();
     }
+
+    public Long findReceiverIdByRoomIdAndSenderId(Long room_id, Long sender_id) {
+        ChattingRoom chattingRoom = em.createQuery(
+                "Select c from ChattingRoom c where c.id = :room_id", ChattingRoom.class)
+                .setParameter("room_id", room_id)
+                .getResultList()
+                .get(0);
+        if(chattingRoom.getBuyer().getId() == sender_id) {
+            return chattingRoom.getSeller().getId();
+        }
+        else {
+            return chattingRoom.getBuyer().getId();
+        }
+    }
 }
