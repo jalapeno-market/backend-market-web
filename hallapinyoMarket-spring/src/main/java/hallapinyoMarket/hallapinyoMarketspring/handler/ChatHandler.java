@@ -70,7 +70,7 @@ public class ChatHandler extends TextWebSocketHandler {
                     " \"type\" : \"ERROR\",\n" +
                     " \"roomId\" : 0,\n" +
                     " \"senderUserId\" : \"\",\n" +
-                    " \"message\" : \"이상한 세션 값입니다. 웹 소켓을 종료합니다.\"\n" +
+                    " \"message\" : \"세션값과 senderUserId 값이 일치 하지 않습니다. 웹 소켓을 종료합니다.\"\n" +
                     "}"));
             throw new WebSocketJsonException();
         }
