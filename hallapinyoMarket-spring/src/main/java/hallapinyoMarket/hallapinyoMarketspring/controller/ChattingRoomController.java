@@ -65,6 +65,7 @@ public class ChattingRoomController {
     }
 
 
+
     @PostMapping("/posts/{post_id}/chatting_rooms") // 해당 포스트를 이용해 채팅룸을 생성한다.
     public PostIdSendForm createChattingRoomByPost(@PathVariable("post_id") Long post_id, HttpServletRequest request) throws Exception {
         HttpSession session = request.getSession(false);
