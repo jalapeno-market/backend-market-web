@@ -36,7 +36,7 @@ public class ChatController {
         return new ErrorResult("BAD", e.getMessage());
     }
 
-    @GetMapping("/chatting_rooms/{chattingRoom_id}/chats") // 채팅룸의 챗을 모두 보내준다.
+    @GetMapping("/chatting-rooms/{chattingRoom_id}/chats") // 채팅룸의 챗을 모두 보내준다.
     public List<Chat> returnChatsByChattingRoom(@PathVariable("chattingRoom_id") Long chattingRoom_id, HttpServletRequest request) throws Exception {
         HttpSession session = request.getSession(false);
         validAuthorized(session);

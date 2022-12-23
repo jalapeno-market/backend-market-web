@@ -45,7 +45,7 @@ public class ChattingRoomController {
         log.error("[exceptionHandle] ex", e);
         return new ErrorResult("BAD", e.getMessage());
     }
-    @GetMapping("/chatting_rooms") // 해당 유저의 채팅룸을 모두 보여준다.
+    @GetMapping("/chatting-rooms") // 해당 유저의 채팅룸을 모두 보여준다.
     public List<ChattingRoom> returnChattingRoomsByMember(HttpServletRequest request) throws Exception {
         HttpSession session = request.getSession(false);
         validAuthorized(session);
@@ -56,7 +56,7 @@ public class ChattingRoomController {
     }
 
 
-    @GetMapping("posts/{post_id}/chatting_rooms") // 해당 포스트의 채팅룸을 모두 보여준다.
+    @GetMapping("posts/{post_id}/chatting-rooms") // 해당 포스트의 채팅룸을 모두 보여준다.
     public List<ChattingRoom> returnChattingRoomsByPost(@PathVariable("post_id") Long post_id, HttpServletRequest request) throws Exception {
         HttpSession session = request.getSession(false);
         validAuthorized(session);
@@ -66,7 +66,7 @@ public class ChattingRoomController {
 
 
 
-    @PostMapping("/posts/{post_id}/chatting_rooms") // 해당 포스트를 이용해 채팅룸을 생성한다.
+    @PostMapping("/posts/{post_id}/chatting-rooms") // 해당 포스트를 이용해 채팅룸을 생성한다.
     public PostIdSendForm createChattingRoomByPost(@PathVariable("post_id") Long post_id, HttpServletRequest request) throws Exception {
         HttpSession session = request.getSession(false);
         validAuthorized(session);
@@ -98,7 +98,7 @@ public class ChattingRoomController {
         return form;
     }
 
-    @DeleteMapping("chatting_rooms/{chattingRoom_id}") // 해당 채팅룸을 삭제한다.
+    @DeleteMapping("chatting-rooms/{chattingRoom_id}") // 해당 채팅룸을 삭제한다.
     public void deleteChattingRoom(@PathVariable("chattingRoom_id") Long chattingRoom_id, HttpServletRequest request) throws Exception {
         HttpSession session = request.getSession(false);
         validAuthorized(session);
