@@ -4,6 +4,7 @@ import hallapinyoMarket.hallapinyoMarketspring.controller.login.SessionConst;
 import hallapinyoMarket.hallapinyoMarketspring.domain.Chat;
 import hallapinyoMarket.hallapinyoMarketspring.exception.exhandler.ErrorResult;
 import hallapinyoMarket.hallapinyoMarketspring.repository.ChatRepository;
+import hallapinyoMarket.hallapinyoMarketspring.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -20,8 +21,7 @@ import java.util.List;
 @Slf4j
 public class ChatController {
 
-    private final ChatRepository chatRepository;
-
+    private final ChatService chatService;
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(IllegalAccessException.class)
     public ErrorResult illegalAccessHandle(IllegalAccessException e) {
@@ -41,7 +41,7 @@ public class ChatController {
         HttpSession session = request.getSession(false);
         validAuthorized(session);
 
-        return chatRepository.findByChattingRoomId(chattingRoom_id);
+        return chatService.getChatsByChattingRoom(chattingRoom_id);
     }
 
     private void validAuthorized(HttpSession session) throws IllegalAccessException {

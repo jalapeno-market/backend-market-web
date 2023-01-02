@@ -11,6 +11,7 @@ import hallapinyoMarket.hallapinyoMarketspring.exception.exhandler.ErrorResult;
 import hallapinyoMarket.hallapinyoMarketspring.repository.ChattingRoomRepository;
 import hallapinyoMarket.hallapinyoMarketspring.repository.MemberRepository;
 import hallapinyoMarket.hallapinyoMarketspring.repository.PostRepository;
+import hallapinyoMarket.hallapinyoMarketspring.service.ChattingRoomService;
 import hallapinyoMarket.hallapinyoMarketspring.web.PostIdSendForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +32,7 @@ public class ChattingRoomController {
     private final ChattingRoomRepository chattingRoomRepository;
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
+    private final ChattingRoomService chattingRoomService;
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(IllegalAccessException.class)
@@ -49,10 +51,9 @@ public class ChattingRoomController {
     public List<ChattingRoom> returnChattingRoomsByMember(HttpServletRequest request) throws Exception {
         HttpSession session = request.getSession(false);
         validAuthorized(session);
-
         Member loginMember = (Member) session.getAttribute(SessionConst.LOGIN_MEMBER);
 
-        return chattingRoomRepository.findByMemberId(loginMember.getId());
+        return chattingRoomService.findByMemberId(loginMember.getId());
     }
 
 
@@ -61,7 +62,7 @@ public class ChattingRoomController {
         HttpSession session = request.getSession(false);
         validAuthorized(session);
 
-        return chattingRoomRepository.findByPostId(post_id);
+        return chattingRoomService.findByPostId(post_id);
     }
 
 
@@ -72,30 +73,7 @@ public class ChattingRoomController {
         validAuthorized(session);
         Member loginMember = (Member) session.getAttribute(SessionConst.LOGIN_MEMBER);
 
-        Member member = memberRepository.find(loginMember.getId());
-        Post post = postRepository.findOne(post_id);
-        List<ChattingRoom> chattingRoomValid = chattingRoomRepository.findByPostIdAndBuyer(post_id, loginMember.getId());
-
-        if(member == null || post == null) {
-            throw new RestParameterNullException();
-        }
-
-        if(!(chattingRoomValid.isEmpty())) {    // 중복 채팅방을 만드려고 할때
-            throw new RestParameterOverlapException();
-        }
-
-        if(loginMember.getId() == post.getMember().getId()) {    // 구매자와 판매자가 같은 채팅방을 생성하려 할때
-            throw new RestParameterSelfException();
-        }
-
-        ChattingRoom chattingRoom = new ChattingRoom();
-        chattingRoom.setBuyer(member);
-        chattingRoom.setSeller(post.getMember());
-        chattingRoom.setPost(post);
-
-        PostIdSendForm form = new PostIdSendForm();
-        form.setId(chattingRoomRepository.save(chattingRoom));
-        return form;
+        return chattingRoomService.createChattingRoomByPostId(loginMember, post_id);
     }
 
     @DeleteMapping("chatting-rooms/{chattingRoom_id}") // 해당 채팅룸을 삭제한다.
@@ -103,11 +81,7 @@ public class ChattingRoomController {
         HttpSession session = request.getSession(false);
         validAuthorized(session);
 
-        ChattingRoom chattingRoom = chattingRoomRepository.find(chattingRoom_id);
-        if(chattingRoom == null) {
-            throw new RestParameterNullException();
-        }
-        chattingRoomRepository.delete(chattingRoom_id);
+        chattingRoomService.deleteChattingRoomById(chattingRoom_id);
     }
 
     private void validAuthorized(HttpSession session) throws IllegalAccessException {
