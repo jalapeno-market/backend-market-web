@@ -2,7 +2,6 @@ package hallapinyoMarket.hallapinyoMarketspring.domain;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hallapinyoMarket.hallapinyoMarketspring.controller.login.LoginForm;
-import hallapinyoMarket.hallapinyoMarketspring.controller.login.SessionConst;
 import hallapinyoMarket.hallapinyoMarketspring.service.MemberService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @SpringBootTest
 @AutoConfigureMockMvc
-public class Login {
+public class LoginTest {
 
     @Autowired
     MemberService memberService;
