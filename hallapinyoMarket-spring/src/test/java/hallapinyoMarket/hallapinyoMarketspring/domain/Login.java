@@ -60,7 +60,7 @@ public class Login {
         //given
         LoginForm loginForm = new LoginForm();
         loginForm.setLoginId("test");
-        loginForm.setPassword("test1");
+        loginForm.setPassword("ChatTest");
 
         //when
         String body = objectMapper.writeValueAsString(loginForm);

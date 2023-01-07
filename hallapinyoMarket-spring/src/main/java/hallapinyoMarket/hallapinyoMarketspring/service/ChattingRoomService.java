@@ -38,29 +38,25 @@ public class ChattingRoomService {
         return chattingRoomRepository.findByPostId(memberId);
     }
 
-    public PostIdSendForm createChattingRoomByPostId(Member loginMember, Long post_id) throws Exception {
+    public PostIdSendForm createChattingRoomByPostId(Long loginMember_id, Long post_id) {
 
-        Member member = memberRepository.find(loginMember.getId());
+        Member member = memberRepository.find(loginMember_id);
         Post post = postRepository.findOne(post_id);
-        List<ChattingRoom> chattingRoomValid = chattingRoomRepository.findByPostIdAndBuyer(post_id, loginMember.getId());
+        List<ChattingRoom> chattingRoomValid = chattingRoomRepository.findByPostIdAndBuyer(post_id, loginMember_id);
 
         if(member == null || post == null) {
             throw new RestParameterNullException();
         }
-
         if(!(chattingRoomValid.isEmpty())) {    // 중복 채팅방을 만드려고 할때
             throw new RestParameterOverlapException();
         }
-
-        if(loginMember.getId() == post.getMember().getId()) {    // 구매자와 판매자가 같은 채팅방을 생성하려 할때
+        if(loginMember_id == post.getMember().getId()) {    // 구매자와 판매자가 같은 채팅방을 생성하려 할때
             throw new RestParameterSelfException();
         }
-
         ChattingRoom chattingRoom = new ChattingRoom();
         chattingRoom.setBuyer(member);
         chattingRoom.setSeller(post.getMember());
         chattingRoom.setPost(post);
-
         PostIdSendForm form = new PostIdSendForm();
         form.setId(chattingRoomRepository.save(chattingRoom));
         return form;

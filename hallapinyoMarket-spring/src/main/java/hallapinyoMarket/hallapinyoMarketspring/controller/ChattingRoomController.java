@@ -52,20 +52,15 @@ public class ChattingRoomController {
         HttpSession session = request.getSession(false);
         validAuthorized(session);
         Member loginMember = (Member) session.getAttribute(SessionConst.LOGIN_MEMBER);
-
         return chattingRoomService.findByMemberId(loginMember.getId());
     }
-
 
     @GetMapping("posts/{post_id}/chatting-rooms") // 해당 포스트의 채팅룸을 모두 보여준다.
     public List<ChattingRoom> returnChattingRoomsByPost(@PathVariable("post_id") Long post_id, HttpServletRequest request) throws Exception {
         HttpSession session = request.getSession(false);
         validAuthorized(session);
-
         return chattingRoomService.findByPostId(post_id);
     }
-
-
 
     @PostMapping("/posts/{post_id}/chatting-rooms") // 해당 포스트를 이용해 채팅룸을 생성한다.
     public PostIdSendForm createChattingRoomByPost(@PathVariable("post_id") Long post_id, HttpServletRequest request) throws Exception {
@@ -73,7 +68,7 @@ public class ChattingRoomController {
         validAuthorized(session);
         Member loginMember = (Member) session.getAttribute(SessionConst.LOGIN_MEMBER);
 
-        return chattingRoomService.createChattingRoomByPostId(loginMember, post_id);
+        return chattingRoomService.createChattingRoomByPostId(loginMember.getId(), post_id);
     }
 
     @DeleteMapping("chatting-rooms/{chattingRoom_id}") // 해당 채팅룸을 삭제한다.

@@ -2,6 +2,7 @@ package hallapinyoMarket.hallapinyoMarketspring.repository;
 
 import hallapinyoMarket.hallapinyoMarketspring.domain.Chat;
 import hallapinyoMarket.hallapinyoMarketspring.domain.ChattingRoom;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,10 +11,10 @@ import javax.persistence.PersistenceContext;
 import java.util.List;
 
 @Repository
-@Transactional
+@RequiredArgsConstructor
 public class ChatRepository {
-    @PersistenceContext
-    private EntityManager em;
+
+    private final EntityManager em;
 
     public Long save(Chat chat) {
         em.persist(chat);
