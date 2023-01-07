@@ -26,4 +26,9 @@ public class Member {
 
     @NotEmpty
     private String nickname;
+
+    public void change(String userId, String nickname) {
+        this.userId = userId;
+        this.nickname = nickname;
+    }
 }
