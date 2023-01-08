@@ -34,7 +34,7 @@ public class PostService {
         List<String> imageNames = getImageNames(postForm);
         Image image = getImageInstance(imageNames);
         Post post = Post.of(postForm.getTitle(), postForm.getContents(), image, member, LocalDateTime.now(),
-                postForm.getPrice(), PostStatus.SALE);
+                postForm.getPrice(), PostStatus.SALE, false);
 
         postRepository.save(post);
         return post.getId();
@@ -88,7 +88,7 @@ public class PostService {
     @Transactional
     public PostIdDto deleteOne(Long postId) {
         Post findPost = postRepository.findOne(postId);
-        postRepository.deletePost(findPost);
+        findPost.setIs_deleted(true);
         return new PostIdDto(findPost.getId());
     }
 

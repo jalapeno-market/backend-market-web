@@ -32,7 +32,7 @@ public class PostRepository {
                 .select(post)
                 .from(post)
                 .join(post.member, member)
-                .where(post.member.userId.eq(userId))
+                .where(post.member.userId.eq(userId), post.is_deleted.eq(false))
                 .fetch();
 
         return postsByUserId.size();
@@ -45,7 +45,7 @@ public class PostRepository {
         return query
                 .select(post)
                 .from(post)
-                .where(post.member.userId.eq(userId))
+                .where(post.member.userId.eq(userId), post.is_deleted.eq(false))
                 .orderBy(post.createdAt.desc())
                 .offset(offset)
                 .limit(limit)
@@ -60,14 +60,10 @@ public class PostRepository {
         return query
                 .select(post)
                 .from(post)
-                .where(post.status.eq(PostStatus.SALE))
+                .where(post.status.eq(PostStatus.SALE), post.is_deleted.eq(false))
                 .orderBy(post.createdAt.desc())
                 .offset(offset)
                 .limit(limit)
                 .fetch();
-    }
-
-    public void deletePost(Post post) {
-        em.remove(post);
     }
 }
