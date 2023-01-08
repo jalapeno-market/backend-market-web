@@ -15,6 +15,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -48,6 +49,13 @@ public class PostController {
         return new ErrorResult("BAD", e.getMessage());
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ErrorResult illegalExHandle(NullPointerException e) {
+        log.error("[exceptionHandle] ex", e);
+        return new ErrorResult("BAD", e.getMessage());
+    }
+
     @PostMapping("/post")
     public Result savePost(@ModelAttribute @Valid PostForm postForm, HttpServletRequest request) throws Exception {
 
@@ -61,7 +69,7 @@ public class PostController {
         return new Result(new PostIdDto(post_id));
     }
 
-    private static void validateImagesSize(List<MultipartFile> images) {
+    private void validateImagesSize(List<MultipartFile> images) {
         if(images.size() < 1 || images.size() > 3) {
             throw new IllegalArgumentException("잘못된 입력입니다.");
         }

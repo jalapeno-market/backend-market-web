@@ -1,0 +1,18 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+<div class="main">
+    <h1 class="logo">할라피뇨마켓 관리자 페이지</h1>
+    <div class="container">
+        <form th:object="${loginForm}" action="/admin/login" method="post">
+            <input type="text" placeholder="ID" id="id" th:field="*{loginId}">
+            <input type="password" placeholder="Password" id="password" th:field="*{password}">
+            <button type="submit" id="login" class="account">login</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

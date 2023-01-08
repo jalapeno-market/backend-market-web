@@ -39,8 +39,10 @@ public class Post {
     @Enumerated(EnumType.STRING)
     private PostStatus status;
 
+    private Boolean is_deleted;
+
     public static Post of(String title, String contents, Image image, Member member, LocalDateTime createdAt,
-                          String price, PostStatus status) {
+                          String price, PostStatus status, Boolean is_deleted) {
         Post post = new Post();
         post.setTitle(title);
         post.setContents(contents);
@@ -49,6 +51,7 @@ public class Post {
         post.setCreatedAt(createdAt);
         post.setPrice(price);
         post.setStatus(status);
+        post.setIs_deleted(is_deleted);
         return post;
     }
 }

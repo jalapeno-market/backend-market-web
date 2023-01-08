@@ -15,7 +15,6 @@ import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
 
 @RestController
 @RequiredArgsConstructor
@@ -46,8 +45,8 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public Result login(@RequestBody @Valid LoginForm form, BindingResult bindingResult,
-                        HttpServletRequest request) throws LoginException {
+    public Result<MemberDto> login(@RequestBody @Valid LoginForm form, BindingResult bindingResult,
+                                   HttpServletRequest request) throws LoginException {
 
         if(bindingResult.hasErrors()) {
             throw new IllegalArgumentException("잘못된 입력 값");
@@ -62,7 +61,7 @@ public class LoginController {
         HttpSession session = request.getSession();
         session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember);
 
-        return new Result(new MemberDto(loginMember.getUserId(), loginMember.getNickname()));
+        return new Result<>(new MemberDto(loginMember.getUserId(), loginMember.getNickname()));
     }
 
 
